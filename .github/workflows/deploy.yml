@@ -3,7 +3,7 @@ name: Build and Push Docker image to Docker Hub
 on:
   push:
     branches:
-      - main  # Puedes cambiar esta rama por la que uses para producción
+      - test 
 
 jobs:
   build_and_push:
