@@ -23,7 +23,8 @@ services:
     depends_on:
       - db
     volumes:
-      - ./src:/var/www/html
+      - .:/var/www/html
 
 volumes:
   mysql_data:
+
