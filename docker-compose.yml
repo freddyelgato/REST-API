@@ -1,23 +1,23 @@
 version: '3.8'
 services:
-  # Servicio de MySQL
+  
   db:
     image: mysql:8.0
     container_name: mysql-db
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword  # Solo se configura el password para root
-      MYSQL_DATABASE: api_rest          # Base de datos inicial
+      MYSQL_ROOT_PASSWORD: rootpassword  
+      MYSQL_DATABASE: api_rest          
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
 
-  # Servicio de PHP con Apache
+  
   php-apache:
     build: .
     container_name: php-apache
     ports:
-      - "8081:80"
+      - "8080:80"
     depends_on:
       - db
     volumes:

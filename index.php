@@ -1,97 +1,96 @@
 <?php
 
-$host = "db";  // Cambiar de localhost a db
-$usuario="root";
-$password="";
-$basededatos="api_rest";
+$host = "db";  
+$user = "root";
+$password = "";
+$database = "api_rest";
 $mysqli = new mysqli("db", "root", "rootpassword", "api_rest");
 
 if ($mysqli->connect_error) {
-    die("Conexión no establecida: " . $mysqli->connect_error);
+    die("Connection failed: " . $mysqli->connect_error);
 }
 
 header("Content-Type: application/json");
 
-// Obtener el método de la solicitud
-$metodo = $_SERVER['REQUEST_METHOD'];  // Corregir la clave a REQUEST_METHOD
+$method = $_SERVER['REQUEST_METHOD']; 
 
-$path= isset($_SERVER['PATH_INFO'])?$_SERVER['PATH_INFO']:'/';
-$buscarId= explode('/',$path);
-$id =($path!=='/')? end ($buscarId):null;
+$path = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '/';
+$searchId = explode('/', $path);
+$id = ($path !== '/') ? end($searchId) : null;
 
-switch($metodo){
-    // Select Usuarios
+switch ($method) {
+    // Select
     case 'GET':
-        consultaSelect($mysqli,$id);
+        selectData($mysqli, $id);
         break;
     // Insert
     case 'POST':
-        insertarDato($mysqli);
+        insertData($mysqli);
         break;
     // Update
     case 'PUT':
-        actualizarDato($mysqli,$id);
+        updateData($mysqli, $id);
         break;
     // Delete
     case 'DELETE':
-        borrarDato($mysqli,$id);
+        deleteData($mysqli, $id);
         break;
     default:
-        echo "Método no permitido";
+        echo "Method not allowed";
         break;
 }
 
-function consultaSelect($mysqli,$id){
-    $sql=($id===null)?"SELECT * FROM friends": "SELECT * FROM friends WHERE id=$id";
-    $resultado= $mysqli->query($sql);
+function selectData($mysqli, $id) {
+    $sql = ($id === null) ? "SELECT * FROM friends" : "SELECT * FROM friends WHERE id=$id";
+    $result = $mysqli->query($sql);
 
-    if($resultado){
-        $datos=array();
-        while($fila=$resultado->fetch_assoc()){
-            $datos[]=$fila;
+    if ($result) {
+        $data = array();
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
         }
-        echo json_encode($datos);
+        echo json_encode($data);
     }
 }
 
-function insertarDato($mysqli){
-    $dato = json_decode(file_get_contents('php://input'),true);
-    $nombre=$dato['nombre'];
-    print_r($nombre);
+function insertData($mysqli) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $name = $data['name'];
+    print_r($name);
 
-    $sql="INSERT INTO friends(nombre) VALUES ('$nombre')";
-    $resultado= $mysqli->query($sql);
+    $sql = "INSERT INTO friends(name) VALUES ('$name')";
+    $result = $mysqli->query($sql);
 
-    if($resultado){
-        $dato['id']=$mysqli->insert_id; // Corregir la variable
-        echo json_encode($dato);
-    }else{
-        echo json_encode(array('error'=> 'Error al crear el usuario'));
-    }
-}
-
-function borrarDato($mysqli,$id){
-    $sql="DELETE FROM friends WHERE id = $id";
-    $resultado= $mysqli->query($sql);
-
-    if($resultado){
-        echo json_encode(array('mensaje'=>'Usuario ELIMINADO'));
-    }else{
-        echo json_encode(array('error'=> 'Error al borrar el usuario'));
-    }
-}
-
-function actualizarDato($mysqli, $id) {
-    $dato = json_decode(file_get_contents('php://input'), true);
-    $nombre = $dato['nombre'];
-    
-    $sql = "UPDATE friends SET nombre = '$nombre' WHERE id = $id";
-    $resultado = $mysqli->query($sql);
-
-    if ($resultado) {
-        echo json_encode(array('mensaje' => 'Usuario ACTUALIZADO', 'id' => $id, 'nombre' => $nombre));
+    if ($result) {
+        $data['id'] = $mysqli->insert_id; // Correct variable
+        echo json_encode($data);
     } else {
-        echo json_encode(array('error' => 'Error al ACTUALIZAR DATO', 'id' => $id));
+        echo json_encode(array('error' => 'Error creating user'));
+    }
+}
+
+function deleteData($mysqli, $id) {
+    $sql = "DELETE FROM friends WHERE id = $id";
+    $result = $mysqli->query($sql);
+
+    if ($result) {
+        echo json_encode(array('message' => 'User DELETED'));
+    } else {
+        echo json_encode(array('error' => 'Error deleting user'));
+    }
+}
+
+function updateData($mysqli, $id) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $name = $data['name'];
+
+    $sql = "UPDATE friends SET name = '$name' WHERE id = $id";
+    $result = $mysqli->query($sql);
+
+    if ($result) {
+        echo json_encode(array('message' => 'User UPDATED', 'id' => $id, 'name' => $name));
+    } else {
+        echo json_encode(array('error' => 'Error updating data', 'id' => $id));
     }
 }
 
