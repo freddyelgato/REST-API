@@ -2,7 +2,7 @@
 
 $host = "db";  // Cambiar de localhost a db
 $usuario="root";
-$password="";
+$password = "rootpassword";
 $basededatos="api_rest";
 $mysqli = new mysqli("db", "root", "rootpassword", "api_rest");
 
